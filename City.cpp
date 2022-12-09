@@ -1,10 +1,11 @@
 //######################## MY HAEEEEDER BABEEEDER ######################
 //
 //
-//	AUTOR:		Max
+//	AUTOR:		MacRosefield
 //	DATE:		20.11.2022
-//  Version:	00-001
-//
+//  VERS:		00.001
+//				|	|___ minor index
+//				|_______ major index
 // 
 //######################## MY HAEEEEDER BABEEEDER ######################
 
