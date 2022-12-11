@@ -11,8 +11,8 @@
 
 #include <iostream>
 #include <string>
-#include <chrono>
-#include <thread>
+#include <chrono>		//notwendig für load animation sleep
+#include <thread>		//notwendig für load animation sleep
 
 using namespace std;
 
@@ -25,15 +25,20 @@ void subMenu();
 void subMenuOption();
 void build();
 int loadingAnimation();
+int proof(int** arr, int i, int j, int x, int y);
+void errorScreenOut();
+void errorScreenFull();
 
 
-int choice1 = 0;
-int choice2 = 0;
-int** city;
+
+int choice1 = 0;		//Menu 1 switcher
+int choice2 = 0;		//Menu 2 switcher
+int** city;				// City array 2D
 int i, j, n, m;
 int gebIndex;
 int buildSizeX, buildSizeY;
 int setX, setY;
+int errorState = 0;	//Hilfsvariable zum prüfen ob bauauftrag illegal
 
 int main(void)
 {
@@ -172,7 +177,7 @@ void mainMenu()
 
 void subMenu() {
 	cout << "========    SUB MENU   ============" << endl;
-	cout << "   Zurueck          - - - -  [1]   " << endl;
+	cout << " ==  BACK  ==       - - - -  [1]   " << endl;
 	cout << " ==  EXIT  ==       - - - -  [2]   " << endl;
 	cout << "======== SELECT UR OPTION =========" << endl;
 	cin >> choice2;
@@ -202,6 +207,7 @@ void subMenuOption() {
 
 		case 2: cout << "Option [2] wurde ausgewaehlt!" << endl;
 			cout << "PROGRAMM WIRD BEENDET" << endl;
+			cout << "VIELEN DANK DAS SIE MIT DEM BAUMASTER 7000 GEARBEITET HABEN" << endl;
 			loadingAnimation();
 			system("exit");
 
@@ -223,37 +229,69 @@ int loadingAnimation()
 	for (int i = 0; i < size(loading); i++)
 	{
 		cout << loading[i];
-		this_thread::sleep_for(chrono::milliseconds(150));
+		//this_thread::sleep_for(chrono::milliseconds(150));
 	}
 	cout << endl;
 	return 0;
 }
 
+void errorScreenOut() {
+	cout << "========     ERROR     ============" << endl;
+	cout << "    AUSSERHALB DES BAUBEREICHS     " << endl;
+	cout << "==== BITTE EINGABE KORRIGIEREN ====" << endl;
+
+}
+
+void errorScreenFull() {
+	cout << "========     ERROR     ============" << endl;
+	cout << "       FELD BEREITS BELEGT         " << endl;
+	cout << "==== BITTE EINGABE KORRIGIEREN ====" << endl;
+
+}
+
+
 void build() {
 	gebIndex = 0;
 	cin >> gebIndex;
 
-	cout << "Bitte gib noch die breite des zu planenden Gebaeudes ein." << endl;
+	do {
+		errorState = 0;
+		cout << "Bitte gib noch die breite des zu planenden Gebaeudes ein." << endl;
 
-	cin >> buildSizeX;
+		cin >> buildSizeX;
 
-	cout << "Nun die Hoehe." << endl;
+		cout << "Nun die Hoehe." << endl;
 
-	cin >> buildSizeY;
+		cin >> buildSizeY;
 
-	cout << "Nun fehlt nicht mehr viel" << endl;
-	cout << "Lediglich die Position des Gebaeudes" << endl;
+		cout << "Nun fehlt nicht mehr viel" << endl;
+		cout << "Lediglich die Position des Gebaeudes" << endl;
 
-	cout << endl;
+		cout << endl;
 
-	cout << "Bitte gib zuerst die X Koordinate des linken oberen Eckpunktes ein" << endl;
-	cin >> setX;
-	cout << "Und nun die Y Koordinate" << endl;
-	cin >> setY;
-	cout << "DANKE, Deine Eingaben werden nun verarbeitet" << endl;
+		cout << "Bitte gib zuerst die X Koordinate des linken oberen Eckpunktes ein" << endl;
+		cin >> setX;
+		cout << "Und nun die Y Koordinate" << endl;
+		cin >> setY;
+		cout << "DANKE, Deine Eingaben werden nun verarbeitet" << endl;
+
+		loadingAnimation();
+
+		proof(city, setX, setY, buildSizeX, buildSizeY);
+
+		switch (errorState) {
+		case 1: errorScreenOut(); break;
+		case 2: errorScreenFull(); break;
+		default: break;
+		}
+
+	} while (errorState > 0);
 
 	loadingAnimation();
-	loadingAnimation();
+
+
+
+
 
 	setzen(city, setX, setY, gebIndex, buildSizeX, buildSizeY);
 
@@ -278,4 +316,34 @@ void setzen(int** arr, int i, int j, int id, int x, int y)
 		}
 
 	}
+}
+
+int proof(int** arr, int i, int j, int x, int y) {
+
+	int row = i + y;
+	int col = j + x;
+
+	errorState = 0;
+
+	if (row > n || col > m) {
+		errorState = 1;
+	}
+	else {
+		for (int o = i; o < row; o++) {
+			for (int p = j; p < col; p++) {
+
+				if (arr[o][p] > 0) {
+					errorState = 2;
+
+				}
+
+			}
+		}
+	}
+	// Eingabe der Matrixelemente
+	// Hier wird geprüft ob die felder schon bebaut sind oder wir uns ausserhlab der stadt befinden.
+	/*
+
+	}*/
+	return errorState;
 }
