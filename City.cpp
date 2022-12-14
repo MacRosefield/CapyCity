@@ -11,14 +11,16 @@
 
 #include <iostream>
 #include <string>
-#include <chrono>		//notwendig für load animation sleep
-#include <thread>		//notwendig für load animation sleep
+#include <limits>		// notwendig für die Abfrage console input
+#include <chrono>		// notwendig für load animation sleep
+#include <thread>		// notwendig für load animation sleep
 
 using namespace std;
 
 void initialMap(int** arr, int row, int col);
 void plottMap(int** arr, int row, int col);
 void setzen(int** arr, int i, int j, int id, int x, int y);
+void loeschen(int** arr);
 void menu();
 void mainMenu();
 void subMenu();
@@ -44,23 +46,36 @@ int main(void)
 {
 	enum gebaude
 	{
-		LEER,
-		SOLARPANEL,
-		WINDKRAFTWERK,
-		WASSERKRAFTWERK
+		LEER = 0,
+		SOLARPANEL = 1,
+		WINDKRAFTWERK = 2,
+		WASSERKRAFTWERK = 3
 	};
 
 	cout << "Herzlich Wilkommen im Baumaster 7000" << endl;
 	cout << "Ihr Tool für den unnoetigen Landschaftsplaner" << endl;
 
 	// Eingabe der Dimension fuer den 2D Array
-	cout << "Anzahl der Zeilen: ";
-	cin >> n;
-	cout << endl;
 
-	cout << "Anzahl der Spalten: ";
-	cin >> m;
-	cout << endl;
+	do {
+		cout << "Anzahl der Zeilen eingeben: " << endl;
+		if (cin >> n) break;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Bitte nur ganze Zahlen eingeben: [0 - 50]" << endl;
+		loadingAnimation();
+	} while (true);
+
+	do {
+		cout << "Anzahl der Spalten eingeben: " << endl;
+		if (cin >> m) break;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Bitte nur ganze Zahlen eingeben: [0 - 50]" << endl;
+		loadingAnimation();
+	} while (true);
+
+
 
 	if (n <= 0 || m <= 0 || n > 50 || m > 50)
 	{
@@ -68,9 +83,9 @@ int main(void)
 		return -1;
 	}
 
-	// Speicherplatzreservierung notwendig, da wir hier einen dynamischen Array erstellen wollen        spalte      spalte
-	// Array a  double * bestimmt sozusagen die Anzahl der Zeilen                               row ||  a[0]        a[0]    a[0]    a[0]
-	// Innerhalb der Zeilen wird jeweils ein Array mit "m" Spalten erzeugt                      row ||  a[0]        a[0]    a[0]    a[0]
+	// Speicherplatzreservierung notwendig, da wir hier einen dynamischen Array erstellen wollen        spalte    spalte
+	// Array a  double * bestimmt sozusagen die Anzahl der Zeilen                               row ||  [0]        [0]    [0]   [0]
+	// Innerhalb der Zeilen wird jeweils ein Array mit "m" Spalten erzeugt                      row ||  [0]        [0]    [0]   [0]
 	city = new int* [n];
 	for (i = 0; i < n; i++)
 		city[i] = new int[m];
@@ -108,7 +123,7 @@ void plottMap(int** arr, int row, int col)
 	{
 		for (int j = 0; j < col; j++)
 		{
-			cout << "a[" << arr[i][j] << "]";
+			cout << "[ " << arr[i][j] << " ]";
 		}
 		cout << endl;
 	}
@@ -149,6 +164,13 @@ void menu() {
 			break;
 
 		case 3: cout << "Option [3] wurde ausgewählt!" << endl;
+			cout << "Abriss sequenz gestartet" << endl;
+			loadingAnimation();
+
+			loeschen(city);
+
+
+
 			break;
 		case 4: cout << "Option [4] wurde ausgewählt!" << endl;
 			break;
@@ -167,7 +189,7 @@ void mainMenu()
 	cout << "========   MAIN MENU   ============" << endl;
 	cout << " Bauplan anzeigen   - - - -  [1]   " << endl;
 	cout << " Baumodus starten   - - - -  [2]   " << endl;
-	cout << " Option 3           - - - -  [3]   " << endl;
+	cout << " Bauplatz freigeben - - - -  [3]   " << endl;
 	cout << " Option 4           - - - -  [4]   " << endl;
 	cout << " ==  EXIT  ==       - - - -  [5]   " << endl;
 	cout << "                                   " << endl;
@@ -316,6 +338,18 @@ void setzen(int** arr, int i, int j, int id, int x, int y)
 		}
 
 	}
+}
+
+void loeschen(int** arr) {
+	int x, y;
+	cout << "Bitte X koordinate eingeben:" << endl;
+	cin >> x;
+	cout << "Bitte Y koordinate eingeben:" << endl;
+	cin >> y;
+
+	arr[x][y] = 0;
+
+	subMenuOption();
 }
 
 int proof(int** arr, int i, int j, int x, int y) {
