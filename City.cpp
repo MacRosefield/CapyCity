@@ -1,81 +1,95 @@
-//######################## MY HAEEEEDER BABEEEDER ######################
+// ######################## MY HAEEEEDER BABEEEDER ######################
 //
 //
 //	AUTOR:		MacRosefield
-//	DATE:		20.11.2022
-//  VERS:		00.001
+//	DATE:		29.12.2022
+//   VERS:		00.003
 //				|	|___ minor index
 //				|_______ major index
-// 
-//######################## MY HAEEEEDER BABEEEDER ######################
+//
+//		00.001	project creation
+//		00.002	error handling added
+//		00.003	complete update, changed array to enum type
+//
+// ######################## MY HAEEEEDER BABEEEDER ######################
 
 #include <iostream>
 #include <string>
-#include <limits>		// notwendig für die Abfrage console input
-#include <chrono>		// notwendig für load animation sleep
-#include <thread>		// notwendig für load animation sleep
+#include <limits> // notwendig für die Abfrage console input
+#include <chrono> // notwendig für load animation sleep
+#include <thread> // notwendig für load animation sleep
 
 using namespace std;
 
-void initialMap(int** arr, int row, int col);
-void plottMap(int** arr, int row, int col);
-void setzen(int** arr, int i, int j, int id, int x, int y);
-void loeschen(int** arr);
-void menu();
-void mainMenu();
-void subMenu();
-void subMenuOption();
-void build();
-int loadingAnimation();
-int proof(int** arr, int i, int j, int x, int y);
-void errorScreenOut();
-void errorScreenFull();
+// ############################ DEKLARIEREN #################################
 
+enum class EnergySource
+{
+	LEER,
+	SOLARPANEL,
+	WINDKRAFTWERK,
+	WASSERKRAFTWERK
+};
 
+EnergySource** city;
+int choice1 = 0; // Menu 1 switcher
+int choice2 = 0; // Menu 2 switcher
 
-int choice1 = 0;		//Menu 1 switcher
-int choice2 = 0;		//Menu 2 switcher
-int** city;				// City array 2D
 int i, j, n, m;
 int gebIndex;
 int buildSizeX, buildSizeY;
 int setX, setY;
-int errorState = 0;	//Hilfsvariable zum prüfen ob bauauftrag illegal
+int errorState = 0; // Hilfsvariable zum prüfen ob bauauftrag illegal
+
+// ########################## PROTOTYPS #####################################
+
+void initialMap(EnergySource** arr, int row, int col);
+void plottMap(EnergySource** arr, int row, int col);
+void menu();
+void mainMenu();
+void subMenu();
+void subMenuOption();
+void loeschen(EnergySource** arr);
+int proof(EnergySource** arr, int i, int j, int x, int y);
+
+
+int loadingAnimation();
+void setzen(EnergySource** arr, int i, int j, int id, int x, int y);
+void build();
+
+
+void errorScreenOut();
+void errorScreenFull();
 
 int main(void)
 {
-	enum gebaude
-	{
-		LEER = 0,
-		SOLARPANEL = 1,
-		WINDKRAFTWERK = 2,
-		WASSERKRAFTWERK = 3
-	};
 
 	cout << "Herzlich Wilkommen im Baumaster 7000" << endl;
-	cout << "Ihr Tool für den unnoetigen Landschaftsplaner" << endl;
+	cout << "Ihr Tool fuer die unnoetige Landschaftsplanung" << endl;
 
 	// Eingabe der Dimension fuer den 2D Array
 
-	do {
+	do
+	{
 		cout << "Anzahl der Zeilen eingeben: " << endl;
-		if (cin >> n) break;
+		if (cin >> n)
+			break;
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << "Bitte nur ganze Zahlen eingeben: [0 - 50]" << endl;
 		loadingAnimation();
 	} while (true);
 
-	do {
+	do
+	{
 		cout << "Anzahl der Spalten eingeben: " << endl;
-		if (cin >> m) break;
+		if (cin >> m)
+			break;
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << "Bitte nur ganze Zahlen eingeben: [0 - 50]" << endl;
-		loadingAnimation();
+		// loadingAnimation();
 	} while (true);
-
-
 
 	if (n <= 0 || m <= 0 || n > 50 || m > 50)
 	{
@@ -86,15 +100,17 @@ int main(void)
 	// Speicherplatzreservierung notwendig, da wir hier einen dynamischen Array erstellen wollen        spalte    spalte
 	// Array a  double * bestimmt sozusagen die Anzahl der Zeilen                               row ||  [0]        [0]    [0]   [0]
 	// Innerhalb der Zeilen wird jeweils ein Array mit "m" Spalten erzeugt                      row ||  [0]        [0]    [0]   [0]
-	city = new int* [n];
+	city = new EnergySource * [n];
 	for (i = 0; i < n; i++)
-		city[i] = new int[m];
+		city[i] = new EnergySource[m];
 
 	initialMap(city, n, m);
 
+
+
 	menu();
 
-	//########################################### SPEICHER FREIGEBEN #################################################
+	// ########################################### SPEICHER FREIGEBEN #################################################
 
 	for (i = 0; i < n; i++)
 		delete[] city[i];
@@ -103,45 +119,63 @@ int main(void)
 	return 0;
 }
 
-void initialMap(int** arr, int row, int col)
+void initialMap(EnergySource** arr, int row, int col)
 {
-	// Fuellen die Matrix wieder mit 0 auf
-	int v = 0;
+	// Fuellen die Matrix wieder mit LEER auf
 	for (int i = 0; i < row; i++)
 	{
 		for (int j = 0; j < col; j++)
 		{
-			arr[i][j] = v;
+			arr[i][j] = EnergySource::LEER;
 		}
 	}
 }
 
-void plottMap(int** arr, int row, int col)
+void plottMap(EnergySource** arr, int row, int col)
 {
 	// Ausgabe der Matrix auf der Konsole
 	for (int i = 0; i < row; i++)
 	{
 		for (int j = 0; j < col; j++)
 		{
-			cout << "[ " << arr[i][j] << " ]";
+			switch (arr[i][j])
+			{
+			case EnergySource::LEER:
+				cout << "[    ]";
+				break;
+			case EnergySource::SOLARPANEL:
+				cout << "[ SO ]";
+				break;
+			case EnergySource::WASSERKRAFTWERK:
+				cout << "[ WA ]";
+				break;
+
+			case EnergySource::WINDKRAFTWERK:
+				cout << "[ WI ]";
+				break;
+			default:
+				break;
+			}
 		}
 		cout << endl;
 	}
 	cout << "Energie niveau = 0" << endl;
 }
 
-void menu() {
+void menu()
+{
 
-	do {
+	do
+	{
 		choice1 = 0;
 		mainMenu();
 
-
-		switch (choice1) {
+		switch (choice1)
+		{
 		case 1:
 			cout << "Option [1] wurde ausgewählt!" << endl;
 			cout << "BAUPLAN WIRD GELADEN" << endl;
-			loadingAnimation();
+			// loadingAnimation();
 
 			plottMap(city, n, m);
 
@@ -151,9 +185,10 @@ void menu() {
 
 			break;
 
-		case 2: cout << "Option [2] wurde ausgewählt!" << endl;
+		case 2:
+			cout << "Option [2] wurde ausgewählt!" << endl;
 			cout << "Baumenü wird geladen" << endl;
-			loadingAnimation();
+			// loadingAnimation();
 
 			cout << "Wilkommen im Baumodus - dem Kernfeature vom Bauplaner 7000" << endl;
 			cout << "Bitte geben Sie Gebäudetyp an, den Sie platzieren wollen" << endl;
@@ -163,25 +198,24 @@ void menu() {
 
 			break;
 
-		case 3: cout << "Option [3] wurde ausgewählt!" << endl;
+		case 3:
+			cout << "Option [3] wurde ausgewählt!" << endl;
 			cout << "Abriss sequenz gestartet" << endl;
-			loadingAnimation();
+			// loadingAnimation();
 
 			loeschen(city);
 
-
-
 			break;
-		case 4: cout << "Option [4] wurde ausgewählt!" << endl;
+		case 4:
+			cout << "Option [4] wurde ausgewählt!" << endl;
 			break;
 		case 5:
 			cout << "Programm wird beendet!" << endl;
 			break;
-		default: break;
+		default:
+			break;
 		}
 	} while (choice1 > 5);
-
-
 }
 
 void mainMenu()
@@ -197,7 +231,8 @@ void mainMenu()
 	cin >> choice1;
 }
 
-void subMenu() {
+void subMenu()
+{
 	cout << "========    SUB MENU   ============" << endl;
 	cout << " ==  BACK  ==       - - - -  [1]   " << endl;
 	cout << " ==  EXIT  ==       - - - -  [2]   " << endl;
@@ -205,43 +240,32 @@ void subMenu() {
 	cin >> choice2;
 }
 
-void subMenuOption() {
-
-	do {
-
+void subMenuOption()
+{
+	do
+	{
 		choice2 = 0;
 		subMenu();
-
-		switch (choice2) {
+		switch (choice2)
+		{
 		case 1:
 			cout << "Option [1] wurde ausgewaehlt!" << endl;
 			cout << "ZURUECK" << endl;
-			loadingAnimation();
-
-
-
+			//loadingAnimation();
 			system("pause");
-
 			menu();
-
-
 			break;
-
-		case 2: cout << "Option [2] wurde ausgewaehlt!" << endl;
+		case 2:
+			cout << "Option [2] wurde ausgewaehlt!" << endl;
 			cout << "PROGRAMM WIRD BEENDET" << endl;
 			cout << "VIELEN DANK DAS SIE MIT DEM BAUMASTER 7000 GEARBEITET HABEN" << endl;
-			loadingAnimation();
+			//loadingAnimation();
 			system("exit");
-
 			break;
-
-
-		default: break;
+		default:
+			break;
 		}
 	} while (choice2 > 2);
-
-
-
 }
 
 int loadingAnimation()
@@ -251,126 +275,124 @@ int loadingAnimation()
 	for (int i = 0; i < size(loading); i++)
 	{
 		cout << loading[i];
-		//this_thread::sleep_for(chrono::milliseconds(150));
+		this_thread::sleep_for(chrono::milliseconds(150));
 	}
 	cout << endl;
 	return 0;
 }
 
-void errorScreenOut() {
+void errorScreenOut()
+{
 	cout << "========     ERROR     ============" << endl;
 	cout << "    AUSSERHALB DES BAUBEREICHS     " << endl;
 	cout << "==== BITTE EINGABE KORRIGIEREN ====" << endl;
-
 }
 
-void errorScreenFull() {
+void errorScreenFull()
+{
 	cout << "========     ERROR     ============" << endl;
 	cout << "       FELD BEREITS BELEGT         " << endl;
 	cout << "==== BITTE EINGABE KORRIGIEREN ====" << endl;
-
 }
 
-
-void build() {
+void build()
+{
 	gebIndex = 0;
 	cin >> gebIndex;
 
-	do {
+	do
+	{
 		errorState = 0;
 		cout << "Bitte gib noch die breite des zu planenden Gebaeudes ein." << endl;
 
 		cin >> buildSizeX;
-
 		cout << "Nun die Hoehe." << endl;
-
 		cin >> buildSizeY;
-
 		cout << "Nun fehlt nicht mehr viel" << endl;
 		cout << "Lediglich die Position des Gebaeudes" << endl;
-
 		cout << endl;
-
 		cout << "Bitte gib zuerst die X Koordinate des linken oberen Eckpunktes ein" << endl;
 		cin >> setX;
 		cout << "Und nun die Y Koordinate" << endl;
 		cin >> setY;
 		cout << "DANKE, Deine Eingaben werden nun verarbeitet" << endl;
-
 		loadingAnimation();
-
 		proof(city, setX, setY, buildSizeX, buildSizeY);
-
-		switch (errorState) {
-		case 1: errorScreenOut(); break;
-		case 2: errorScreenFull(); break;
-		default: break;
+		switch (errorState)
+		{
+		case 1:
+			errorScreenOut();
+			break;
+		case 2:
+			errorScreenFull();
+			break;
+		default:
+			break;
 		}
 
 	} while (errorState > 0);
 
 	loadingAnimation();
 
-
-
-
-
 	setzen(city, setX, setY, gebIndex, buildSizeX, buildSizeY);
 
 	cout << "Prozess beendet" << endl;
 
 	subMenuOption();
-
-
 }
 
-void setzen(int** arr, int i, int j, int id, int x, int y)
+void setzen(EnergySource** arr, int i, int j, int id, int x, int y)
 {
 	int row = i + y;
 	int col = j + x;
 	// Eingabe der Matrixelemente
 	// Hier besteht die Möglichkeit jeden einzelnen Wert der Matrix zu bestimmen.
-	for (int o = i; o < row; o++) {
-		for (int p = j; p < col; p++) {
+	for (int o = i; o < row; o++)
+	{
+		for (int p = j; p < col; p++)
+		{
 
-			arr[o][p] = id;
-
+			arr[o][p] = EnergySource(id);
 		}
-
 	}
 }
 
-void loeschen(int** arr) {
+void loeschen(EnergySource** arr)
+{
 	int x, y;
 	cout << "Bitte X koordinate eingeben:" << endl;
 	cin >> x;
 	cout << "Bitte Y koordinate eingeben:" << endl;
 	cin >> y;
 
-	arr[x][y] = 0;
+	arr[x][y] = EnergySource::LEER;
 
 	subMenuOption();
 }
 
-int proof(int** arr, int i, int j, int x, int y) {
+int proof(EnergySource** arr, int i, int j, int x, int y)
+{
 
 	int row = i + y;
 	int col = j + x;
 
 	errorState = 0;
 
-	if (row > n || col > m) {
+	if (row > n || col > m)
+	{
 		errorState = 1;
 	}
-	else {
-		for (int o = i; o < row; o++) {
-			for (int p = j; p < col; p++) {
+	else
+	{
+		for (int o = i; o < row; o++)
+		{
+			for (int p = j; p < col; p++)
+			{
 
-				if (arr[o][p] > 0) {
+				if (arr[o][p] != EnergySource::LEER)
+				{
 					errorState = 2;
-
 				}
-
 			}
 		}
 	}
