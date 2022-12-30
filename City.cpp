@@ -3,13 +3,14 @@
 //
 //	AUTOR:		MacRosefield
 //	DATE:		29.12.2022
-//   VERS:		00.003
+//   VERS:		01.000
 //				|	|___ minor index
 //				|_______ major index
 //
 //		00.001	project creation
 //		00.002	error handling added
 //		00.003	complete update, changed array to enum type
+//		01.000	Version 1 finished
 //
 // ######################## MY HAEEEEDER BABEEEDER ######################
 
@@ -72,30 +73,25 @@ int main(void)
 	do
 	{
 		cout << "Anzahl der Zeilen eingeben: " << endl;
-		if (cin >> n)
+		if (cin >> n && n > 0 && n < 41)		// Abfrage ob cin was in die konsole bekommt
 			break;
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		cout << "Bitte nur ganze Zahlen eingeben: [0 - 50]" << endl;
+		cout << "Bitte nur ganze Zahlen eingeben: [1 - 40]" << endl;
 		loadingAnimation();
 	} while (true);
 
 	do
 	{
 		cout << "Anzahl der Spalten eingeben: " << endl;
-		if (cin >> m)
+		if (cin >> m && m > 0 && m < 41)
 			break;
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		cout << "Bitte nur ganze Zahlen eingeben: [0 - 50]" << endl;
+		cout << "Bitte nur ganze Zahlen eingeben: [1 - 40]" << endl;
 		// loadingAnimation();
 	} while (true);
 
-	if (n <= 0 || m <= 0 || n > 50 || m > 50)
-	{
-		cerr << "Ungueltige Dimension!" << endl;
-		return -1;
-	}
 
 	// Speicherplatzreservierung notwendig, da wir hier einen dynamischen Array erstellen wollen        spalte    spalte
 	// Array a  double * bestimmt sozusagen die Anzahl der Zeilen                               row ||  [0]        [0]    [0]   [0]
@@ -105,7 +101,6 @@ int main(void)
 		city[i] = new EnergySource[m];
 
 	initialMap(city, n, m);
-
 
 
 	menu();
@@ -175,12 +170,9 @@ void menu()
 		case 1:
 			cout << "Option [1] wurde ausgewählt!" << endl;
 			cout << "BAUPLAN WIRD GELADEN" << endl;
-			// loadingAnimation();
+			loadingAnimation();
 
 			plottMap(city, n, m);
-
-			system("pause");
-
 			subMenuOption();
 
 			break;
@@ -188,7 +180,7 @@ void menu()
 		case 2:
 			cout << "Option [2] wurde ausgewählt!" << endl;
 			cout << "Baumenü wird geladen" << endl;
-			// loadingAnimation();
+			loadingAnimation();
 
 			cout << "Wilkommen im Baumodus - dem Kernfeature vom Bauplaner 7000" << endl;
 			cout << "Bitte geben Sie Gebäudetyp an, den Sie platzieren wollen" << endl;
@@ -201,7 +193,7 @@ void menu()
 		case 3:
 			cout << "Option [3] wurde ausgewählt!" << endl;
 			cout << "Abriss sequenz gestartet" << endl;
-			// loadingAnimation();
+			loadingAnimation();
 
 			loeschen(city);
 
@@ -251,15 +243,14 @@ void subMenuOption()
 		case 1:
 			cout << "Option [1] wurde ausgewaehlt!" << endl;
 			cout << "ZURUECK" << endl;
-			//loadingAnimation();
-			system("pause");
+			loadingAnimation();
 			menu();
 			break;
 		case 2:
 			cout << "Option [2] wurde ausgewaehlt!" << endl;
 			cout << "PROGRAMM WIRD BEENDET" << endl;
 			cout << "VIELEN DANK DAS SIE MIT DEM BAUMASTER 7000 GEARBEITET HABEN" << endl;
-			//loadingAnimation();
+			loadingAnimation();
 			system("exit");
 			break;
 		default:
@@ -396,10 +387,5 @@ int proof(EnergySource** arr, int i, int j, int x, int y)
 			}
 		}
 	}
-	// Eingabe der Matrixelemente
-	// Hier wird geprüft ob die felder schon bebaut sind oder wir uns ausserhlab der stadt befinden.
-	/*
-
-	}*/
 	return errorState;
 }
