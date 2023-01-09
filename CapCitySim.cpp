@@ -1,69 +1,23 @@
-// ######################## MY HAEEEEDER BABEEEDER ######################
-//
-//
-//	AUTOR:		MacRosefield
-//	DATE:		29.12.2022
-//   VERS:		01.000
-//				|	|___ minor index
-//				|_______ major index
-//
-//		00.001	project creation
-//		00.002	error handling added
-//		00.003	complete update, changed array to enum type
-//		01.000	Version 1 finished
-//
-// ######################## MY HAEEEEDER BABEEEDER ######################
 
 #include <iostream>
 #include <string>
-#include <limits> // notwendig fÃ¼r die Abfrage console input
-#include <chrono> // notwendig fÃ¼r load animation sleep
-#include <thread> // notwendig fÃ¼r load animation sleep
+#include <limits> // notwendig für die Abfrage console input
+#include <chrono> // notwendig für load animation sleep
+#include <thread> // notwendig für load animation sleep
+#include <typeinfo>
+
+#include "CapCitySim.h"
+#include "Building.h"
+#include "Material.h"
 
 using namespace std;
 
 // ############################ DEKLARIEREN #################################
 
-enum class EnergySource
-{
-	LEER,
-	SOLARPANEL,
-	WINDKRAFTWERK,
-	WASSERKRAFTWERK
-};
-
-EnergySource** city;
-int choice1 = 0; // Menu 1 switcher
-int choice2 = 0; // Menu 2 switcher
-
-int i, j, n, m;
-int gebIndex;
-int buildSizeX, buildSizeY;
-int setX, setY;
-int errorState = 0; // Hilfsvariable zum prÃ¼fen ob bauauftrag illegal
-
-// ########################## PROTOTYPS #####################################
-
-void initialMap(EnergySource** arr, int row, int col);
-void plottMap(EnergySource** arr, int row, int col);
-void menu();
-void mainMenu();
-void subMenu();
-void subMenuOption();
-void loeschen(EnergySource** arr);
-int proof(EnergySource** arr, int i, int j, int x, int y);
 
 
-int loadingAnimation();
-void setzen(EnergySource** arr, int i, int j, int id, int x, int y);
-void build();
 
-
-void errorScreenOut();
-void errorScreenFull();
-
-int main(void)
-{
+void CapCitySim::runin() {
 
 	cout << "Herzlich Wilkommen im Baumaster 7000" << endl;
 	cout << "Ihr Tool fuer die unnoetige Landschaftsplanung" << endl;
@@ -78,7 +32,7 @@ int main(void)
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << "Bitte nur ganze Zahlen eingeben: [1 - 40]" << endl;
-		loadingAnimation();
+
 	} while (true);
 
 	do
@@ -96,68 +50,103 @@ int main(void)
 	// Speicherplatzreservierung notwendig, da wir hier einen dynamischen Array erstellen wollen        spalte    spalte
 	// Array a  double * bestimmt sozusagen die Anzahl der Zeilen                               row ||  [0]        [0]    [0]   [0]
 	// Innerhalb der Zeilen wird jeweils ein Array mit "m" Spalten erzeugt                      row ||  [0]        [0]    [0]   [0]
-	city = new EnergySource * [n];
+	city = new Building * [n];
 	for (i = 0; i < n; i++)
-		city[i] = new EnergySource[m];
+		city[i] = new Building[m];
 
-	initialMap(city, n, m);
+	CapCitySim::initialMap(n, m);
 
+	CapCitySim::plottMap(n, m);
 
-	menu();
+	CapCitySim::menu();
 
 	// ########################################### SPEICHER FREIGEBEN #################################################
 
 	for (i = 0; i < n; i++)
 		delete[] city[i];
 	delete[] city;
-
-	return 0;
 }
 
-void initialMap(EnergySource** arr, int row, int col)
+void CapCitySim::initialMap(int row, int col)
 {
 	// Fuellen die Matrix wieder mit LEER auf
 	for (int i = 0; i < row; i++)
 	{
 		for (int j = 0; j < col; j++)
 		{
-			arr[i][j] = EnergySource::LEER;
+			city[i][j] = Leer();
 		}
 	}
 }
 
-void plottMap(EnergySource** arr, int row, int col)
+void CapCitySim::plottMap(int row, int col)
 {
 	// Ausgabe der Matrix auf der Konsole
 	for (int i = 0; i < row; i++)
 	{
 		for (int j = 0; j < col; j++)
 		{
-			switch (arr[i][j])
-			{
-			case EnergySource::LEER:
-				cout << "[    ]";
-				break;
-			case EnergySource::SOLARPANEL:
-				cout << "[ SO ]";
-				break;
-			case EnergySource::WASSERKRAFTWERK:
-				cout << "[ WA ]";
-				break;
+			string type = city[i][j].getName();
 
-			case EnergySource::WINDKRAFTWERK:
+			if (type == "Leer") {
+				cout << "[    ]";
+			}
+			else if (type == "Solarpanel") {
+				cout << "[ SO ]";
+			}
+			else if (type == "Wasserkraft") {
+				cout << "[ WA ]";
+			}
+			else if (type == "Windkraft") {
 				cout << "[ WI ]";
-				break;
-			default:
-				break;
 			}
 		}
 		cout << endl;
 	}
-	cout << "Energie niveau = 0" << endl;
+
+	Building so = Solarpanel();
+	Building wa = Wasserkraft();
+	Building wi = Windkraft();
+
+	soBasePrice = so.getPrice();
+	waBasePrice = wa.getPrice();
+	wiBasePrice = wi.getPrice();
+
+
+	calcPrice();
+	cout << "================   GEBAUDE   ===================" << endl;
+	cout << "                                   " << endl;
+	cout << "     Solarpanele: " << solCounter << "x" << "     - Grundpreis: " << soBasePrice << " - " << endl;
+	cout << "     resourcenbedarf: ";
+	for (Material m : so.getMaterial())
+		cout << " # " << m.getName();
+	cout << endl;
+
+	cout << "     Wasserkraftwerke: " << wasCounter << "x" << "     - Grundpreis: " << waBasePrice << " - " << endl;
+	cout << "     resourcenbedarf: ";
+	for (Material m : wa.getMaterial())
+		cout << " # " << m.getName();
+	cout << endl;
+
+	cout << "     Windkraftwerke:  " << winCounter << "x" << "     - Grundpreis: " << wiBasePrice << " - " << endl;
+	cout << "     resourcenbedarf: ";
+	for (Material m : wi.getMaterial())
+		cout << " # " << m.getName();
+	cout << endl;
+	cout << "                                   " << endl;
+	cout << "================   KOSTEN   ===================" << endl;
+	cout << "                                   " << endl;
+	cout << "      Solarpanele = " << buildPriceSo << endl;
+	cout << "      Wasserkraftwerke = " << buildPriceWa << endl;
+	cout << "      Windkraftwerke = " << buildPriceWi << endl;
+	cout << "                                   " << endl;
+	cout << "      Materialkosten gesamt = " << materialPriceAll << endl;
+	cout << "      Gebäudekosten gesamt = " << buildPriceAll << endl;
+	cout << "                                   " << endl;
+	cout << "============== SELECT UR OPTION ===============" << endl;
 }
 
-void menu()
+void CapCitySim::menu()
 {
 
 	do
@@ -168,38 +157,35 @@ void menu()
 		switch (choice1)
 		{
 		case 1:
-			cout << "Option [1] wurde ausgewÃ¤hlt!" << endl;
+			cout << "Option [1] wurde ausgewählt!" << endl;
 			cout << "BAUPLAN WIRD GELADEN" << endl;
 			loadingAnimation();
 
-			plottMap(city, n, m);
+			plottMap(n, m);
 			subMenuOption();
 
 			break;
 
 		case 2:
-			cout << "Option [2] wurde ausgewÃ¤hlt!" << endl;
-			cout << "BaumenÃ¼ wird geladen" << endl;
-			loadingAnimation();
+			cout << "Option [2] wurde ausgewählt!" << endl;
+			cout << "Baumenü wird geladen" << endl;
+			//loadingAnimation();
 
-			cout << "Wilkommen im Baumodus - dem Kernfeature vom Bauplaner 7000" << endl;
-			cout << "Bitte geben Sie GebÃ¤udetyp an, den Sie platzieren wollen" << endl;
-			cout << "1 = SOLAR, 2 = WINDKRAFT, 3 = WASSERKRAFT" << endl;
 
 			build();
 
 			break;
 
 		case 3:
-			cout << "Option [3] wurde ausgewÃ¤hlt!" << endl;
+			cout << "Option [3] wurde ausgewählt!" << endl;
 			cout << "Abriss sequenz gestartet" << endl;
-			loadingAnimation();
+			//loadingAnimation();
 
 			loeschen(city);
 
 			break;
 		case 4:
-			cout << "Option [4] wurde ausgewÃ¤hlt!" << endl;
+			cout << "Option [4] wurde ausgewählt!" << endl;
 			break;
 		case 5:
 			cout << "Programm wird beendet!" << endl;
@@ -209,8 +195,7 @@ void menu()
 		}
 	} while (choice1 > 5);
 }
-
-void mainMenu()
+void CapCitySim::mainMenu()
 {
 	cout << "========   MAIN MENU   ============" << endl;
 	cout << " Bauplan anzeigen   - - - -  [1]   " << endl;
@@ -222,8 +207,7 @@ void mainMenu()
 	cout << "======== SELECT UR OPTION =========" << endl;
 	cin >> choice1;
 }
-
-void subMenu()
+void CapCitySim::subMenu()
 {
 	cout << "========    SUB MENU   ============" << endl;
 	cout << " ==  BACK  ==       - - - -  [1]   " << endl;
@@ -231,8 +215,7 @@ void subMenu()
 	cout << "======== SELECT UR OPTION =========" << endl;
 	cin >> choice2;
 }
-
-void subMenuOption()
+void CapCitySim::subMenuOption()
 {
 	do
 	{
@@ -243,14 +226,14 @@ void subMenuOption()
 		case 1:
 			cout << "Option [1] wurde ausgewaehlt!" << endl;
 			cout << "ZURUECK" << endl;
-			loadingAnimation();
+			//loadingAnimation();
 			menu();
 			break;
 		case 2:
 			cout << "Option [2] wurde ausgewaehlt!" << endl;
 			cout << "PROGRAMM WIRD BEENDET" << endl;
 			cout << "VIELEN DANK DAS SIE MIT DEM BAUMASTER 7000 GEARBEITET HABEN" << endl;
-			loadingAnimation();
+			//loadingAnimation();
 			system("exit");
 			break;
 		default:
@@ -259,7 +242,7 @@ void subMenuOption()
 	} while (choice2 > 2);
 }
 
-int loadingAnimation()
+int CapCitySim::loadingAnimation()
 {
 	string loading = "................";
 	cout << "LOADING ";
@@ -272,24 +255,37 @@ int loadingAnimation()
 	return 0;
 }
 
-void errorScreenOut()
+void CapCitySim::errorScreenOut()
 {
 	cout << "========     ERROR     ============" << endl;
 	cout << "    AUSSERHALB DES BAUBEREICHS     " << endl;
 	cout << "==== BITTE EINGABE KORRIGIEREN ====" << endl;
 }
-
-void errorScreenFull()
+void CapCitySim::errorScreenFull()
 {
 	cout << "========     ERROR     ============" << endl;
 	cout << "       FELD BEREITS BELEGT         " << endl;
 	cout << "==== BITTE EINGABE KORRIGIEREN ====" << endl;
 }
 
-void build()
+void CapCitySim::build()
 {
 	gebIndex = 0;
-	cin >> gebIndex;
+
+	do
+	{
+		cout << "Wilkommen im Baumodus - dem Kernfeature vom Bauplaner 7000" << endl;
+		cout << "Bitte geben Sie Gebäudetyp an, den Sie platzieren wollen" << endl;
+		cout << "1 = SOLAR, 2 = WINDKRAFT, 3 = WASSERKRAFT" << endl;
+
+		if (cin >> gebIndex && gebIndex > 0 && gebIndex < 3)		// Abfrage ob cin was in die konsole bekommt
+			break;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Bitte auf Auswahl achten: [1 - 3]" << endl;
+
+	} while (true);
+
 
 	do
 	{
@@ -307,7 +303,7 @@ void build()
 		cout << "Und nun die Y Koordinate" << endl;
 		cin >> setY;
 		cout << "DANKE, Deine Eingaben werden nun verarbeitet" << endl;
-		loadingAnimation();
+		//loadingAnimation();
 		proof(city, setX, setY, buildSizeX, buildSizeY);
 		switch (errorState)
 		{
@@ -323,7 +319,7 @@ void build()
 
 	} while (errorState > 0);
 
-	loadingAnimation();
+	//loadingAnimation();
 
 	setzen(city, setX, setY, gebIndex, buildSizeX, buildSizeY);
 
@@ -331,24 +327,31 @@ void build()
 
 	subMenuOption();
 }
-
-void setzen(EnergySource** arr, int i, int j, int id, int x, int y)
+void CapCitySim::setzen(Building** arr, int i, int j, int id, int x, int y)
 {
 	int row = i + y;
 	int col = j + x;
 	// Eingabe der Matrixelemente
-	// Hier besteht die MÃ¶glichkeit jeden einzelnen Wert der Matrix zu bestimmen.
+	// Hier besteht die Möglichkeit jeden einzelnen Wert der Matrix zu bestimmen.
 	for (int o = i; o < row; o++)
 	{
 		for (int p = j; p < col; p++)
 		{
-
-			arr[o][p] = EnergySource(id);
+			switch (id)
+			{
+			case 1: arr[o][p] = Solarpanel();
+				break;
+			case 2: arr[o][p] = Windkraft();
+				break;
+			case 3: arr[o][p] = Wasserkraft();
+				break;
+			default:
+				break;
+			}
 		}
 	}
 }
-
-void loeschen(EnergySource** arr)
+void CapCitySim::loeschen(Building** arr)
 {
 	int x, y;
 	cout << "Bitte X koordinate eingeben:" << endl;
@@ -356,12 +359,12 @@ void loeschen(EnergySource** arr)
 	cout << "Bitte Y koordinate eingeben:" << endl;
 	cin >> y;
 
-	arr[x][y] = EnergySource::LEER;
+	arr[x][y] = Leer();
 
 	subMenuOption();
 }
 
-int proof(EnergySource** arr, int i, int j, int x, int y)
+int CapCitySim::proof(Building** arr, int i, int j, int x, int y)
 {
 
 	int row = i + y;
@@ -380,7 +383,7 @@ int proof(EnergySource** arr, int i, int j, int x, int y)
 			for (int p = j; p < col; p++)
 			{
 
-				if (arr[o][p] != EnergySource::LEER)
+				if (arr[o][p].getName() != "Leer")
 				{
 					errorState = 2;
 				}
@@ -388,4 +391,57 @@ int proof(EnergySource** arr, int i, int j, int x, int y)
 		}
 	}
 	return errorState;
+}
+
+void CapCitySim::calcPrice() {
+
+	buildPriceAll = 0;
+	buildPriceSo = 0;
+	buildPriceWa = 0;
+	buildPriceWi = 0;
+	solCounter = 0;
+	wasCounter = 0;
+	winCounter = 0;
+
+	materialPriceAll = 0;
+
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < m; j++)
+		{
+
+			buildPriceAll += city[i][j].getPrice();
+
+			if (city[i][j].getName() != "Leer") {
+
+				for (Material n : city[i][j].getMaterial()) {
+
+					materialPriceAll += n.getPrice();
+				}
+			}
+
+
+
+			if (city[i][j].getName() == "Solarpanel") {
+
+
+				buildPriceSo += city[i][j].getPrice();
+				solCounter++;
+			}
+
+			if (city[i][j].getName() == "Wasserkraft") {
+
+
+				buildPriceWa += city[i][j].getPrice();
+				wasCounter++;
+			}
+
+			if (city[i][j].getName() == "Windkraft") {
+
+
+				buildPriceWi += city[i][j].getPrice();
+				winCounter++;
+			}
+		}
+	}
 }
