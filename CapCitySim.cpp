@@ -12,12 +12,9 @@
 #include "MaterialDB.h"
 
 
-
 using namespace std;
 
 // ############################ DEKLARIEREN #################################
-
-
 
 
 void CapCitySim::runin() {
