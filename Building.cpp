@@ -18,13 +18,10 @@ int Building::getPrice() {
 
 
 
-
 Leer::Leer() {
-
 	name = "Leer";
 	label = " ";
 	price = 0;
-
 }
 
 
@@ -32,7 +29,7 @@ Solarpanel::Solarpanel() {
 
 	name = "Solarpanel";
 	label = "S";
-	this->price = solarBasePrice;
+	price = solarBasePrice;
 
 
 	MaterialDB::addMaterial(Metall(), 1);
@@ -44,7 +41,7 @@ Wasserkraft::Wasserkraft() {
 
 	name = "Wasserkraft";
 	label = "A";
-	this->price = wasserBasePrice;
+	price = wasserBasePrice;
 
 
 	MaterialDB::addMaterial(Holz(), 2);
@@ -56,7 +53,7 @@ Windkraft::Windkraft() {
 
 	name = "Windkraft";
 	label = "W";
-	this->price = windBasePrice;
+	price = windBasePrice;
 
 
 	MaterialDB::addMaterial(Metall(), 1);

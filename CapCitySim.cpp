@@ -59,7 +59,7 @@ void CapCitySim::runin() {
 
 	CapCitySim::initialMap(n, m);
 
-	CapCitySim::plottMap(n, m);
+	//CapCitySim::plottMap(n, m);
 
 	CapCitySim::menu();
 
@@ -112,34 +112,32 @@ void CapCitySim::plottMap(int row, int col)
 
 
 	calcPrice();
-	cout << "================   GEBAUDE   ===================" << endl;
+	cout << "================   GEBAEUDE   ===================" << endl;
 	cout << "                                   " << endl;
 	cout << "     Solarpanele: " << solCounter << "x" << "     - Grundpreis: " << solarBasePrice << " - " << endl;
-	cout << "     resourcenbedarf: ";
-	/*for (Material m : so.getMaterial())
-		cout << " # " << m.getName();*/
 	cout << endl;
-
 	cout << "     Wasserkraftwerke: " << wasCounter << "x" << "     - Grundpreis: " << wasserBasePrice << " - " << endl;
-	cout << "     resourcenbedarf: ";
-	//for (Material m : wa.getMaterial())
-	//	cout << " # " << m.getName();
 	cout << endl;
-
 	cout << "     Windkraftwerke:  " << winCounter << "x" << "     - Grundpreis: " << windBasePrice << " - " << endl;
-	cout << "     resourcenbedarf: ";
-	/*for (Material m : wi.getMaterial())
-		cout << " # " << m.getName();*/
 	cout << endl;
 	cout << "                                   " << endl;
 	cout << "================   KOSTEN   ===================" << endl;
 	cout << "                                   " << endl;
-	cout << "      Solarpanele = " << buildPriceSo << endl;
-	cout << "      Wasserkraftwerke = " << buildPriceWa << endl;
-	cout << "      Windkraftwerke = " << buildPriceWi << endl;
+	cout << "      Bauplatz:" << endl;
+	cout << "         Solarpanele = " << buildPriceSo << " $" << endl;
+	cout << "         Wasserkraftwerke = " << buildPriceWa << " $" << endl;
+	cout << "         Windkraftwerke = " << buildPriceWi << " $" << endl;
 	cout << "                                   " << endl;
-	cout << "      Materialkosten gesamt = " << materialPriceAll << endl;
-	cout << "      Gebäudekosten gesamt = " << buildPriceAll << endl;
+	cout << "================   KOSTEN   ===================" << endl;
+	cout << endl;
+	cout << "      Material verbaut:" << endl;
+	for (pair<Material, int> m : MaterialDB::materialUsed) {
+		cout << "        " + m.first.getName() + " - Anzahl: " + to_string(m.second) << endl;
+	}
+	cout << endl;
+	cout << "      Materialkosten gesamt = " << materialPriceAll << " $" << endl;
+	cout << endl;
+	cout << "      Gebaeudekosten gesamt = " << buildPriceAll << " $" << endl;
 	cout << "                                   " << endl;
 	cout << "============== SELECT UR OPTION ===============" << endl;
 }
@@ -161,9 +159,6 @@ void CapCitySim::menu()
 
 			plottMap(n, m);
 
-			for (pair<Material, int> m : MaterialDB::materialUsed) {
-				cout << "Material: " + m.first.getName() + " Anzahl: " + to_string(m.second) << endl;
-			}
 
 
 			subMenuOption();
@@ -410,6 +405,14 @@ void CapCitySim::calcPrice() {
 
 	materialPriceAll = 0;
 
+
+
+	for (pair<Material, int> m : MaterialDB::materialUsed) {
+		materialPriceAll += (m.first.getPrice() * m.second);
+
+	}
+
+
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < m; j++)
@@ -419,16 +422,7 @@ void CapCitySim::calcPrice() {
 
 			if (city[i][j].getName() != "Leer") {
 
-				//################################################
-				// hier muss die map jetzt rein
-
-				for (Material n : city[i][j].getMaterial()) {
-
-					materialPriceAll += n.getPrice();
-				}
 			}
-
-
 
 			if (city[i][j].getName() == "Solarpanel") {
 
@@ -450,6 +444,9 @@ void CapCitySim::calcPrice() {
 				buildPriceWi += city[i][j].getPrice();
 				winCounter++;
 			}
+
 		}
 	}
+
+	buildPriceAll += materialPriceAll;
 }

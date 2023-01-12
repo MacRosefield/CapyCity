@@ -21,7 +21,6 @@ bool operator<(const Material& lhs, const Material& rhs) {
 		return (lhs.price < rhs.price);
 	else
 		return false;
-
 }
 
 
