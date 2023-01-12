@@ -419,6 +419,9 @@ void CapCitySim::calcPrice() {
 
 			if (city[i][j].getName() != "Leer") {
 
+				//################################################
+				// hier muss die map jetzt rein
+
 				for (Material n : city[i][j].getMaterial()) {
 
 					materialPriceAll += n.getPrice();

@@ -1,15 +1,15 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
+
 #include "Material.h"
 #include <map>
 
 using namespace std;
 
-	static const int solarBasePrice = 200;
-	static const int windBasePrice = 100;
-	static const int wasserBasePrice = 50;
+static const int solarBasePrice = 200;
+static const int windBasePrice = 100;
+static const int wasserBasePrice = 50;
 
 class Building {
 
@@ -27,8 +27,8 @@ public:
 	string getLabel();
 	int getPrice();
 
-	vector<Material> needs; // Vector to store Material objects
-	vector<Material> getMaterial();
+
+
 
 };
 
@@ -45,7 +45,7 @@ class Solarpanel : public Building {
 public:
 	// Constructor
 	Solarpanel();
-	
+
 
 };
 
