@@ -1,5 +1,10 @@
 #include <iostream>
 #include "Building.h"
+#include "MaterialDB.h"
+
+
+
+
 
 string Building::getName() {
 	return name;
@@ -31,23 +36,34 @@ Solarpanel::Solarpanel() {
 
 	name = "Solarpanel";
 	label = "S";
-	price = 200;
+	this->price = solarBasePrice;
 	needs = { Metall(), Kunststoff() };
+
+	MaterialDB::addMaterial(Metall(), 1);
+	MaterialDB::addMaterial(Kunststoff(), 1);
+	
 }
 
 Wasserkraft::Wasserkraft() {
 
 	name = "Wasserkraft";
 	label = "A";
-	price = 100;
+	this->price = wasserBasePrice;
 	needs = { Holz(), Holz() };
+	
+	MaterialDB::addMaterial(Holz(), 2);
+	
+
 }
 
 Windkraft::Windkraft() {
 
 	name = "Windkraft";
 	label = "W";
-	price = 50;
+	this->price = windBasePrice;
 	needs = { Holz(), Metall() };
+
+	MaterialDB::addMaterial(Metall(), 1);
+	MaterialDB::addMaterial(Holz(), 1);
 }
 

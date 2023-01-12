@@ -9,6 +9,9 @@
 #include "CapCitySim.h"
 #include "Building.h"
 #include "Material.h"
+#include "MaterialDB.h"
+
+
 
 using namespace std;
 
@@ -102,36 +105,31 @@ void CapCitySim::plottMap(int row, int col)
 			}
 		}
 		cout << endl;
+
 	}
 
-	Building so = Solarpanel();
-	Building wa = Wasserkraft();
-	Building wi = Windkraft();
 
-	soBasePrice = so.getPrice();
-	waBasePrice = wa.getPrice();
-	wiBasePrice = wi.getPrice();
 
 
 	calcPrice();
 	cout << "================   GEBAUDE   ===================" << endl;
 	cout << "                                   " << endl;
-	cout << "     Solarpanele: " << solCounter << "x" << "     - Grundpreis: " << soBasePrice << " - " << endl;
+	cout << "     Solarpanele: " << solCounter << "x" << "     - Grundpreis: " << solarBasePrice << " - " << endl;
 	cout << "     resourcenbedarf: ";
-	for (Material m : so.getMaterial())
-		cout << " # " << m.getName();
+	/*for (Material m : so.getMaterial())
+		cout << " # " << m.getName();*/
 	cout << endl;
 
-	cout << "     Wasserkraftwerke: " << wasCounter << "x" << "     - Grundpreis: " << waBasePrice << " - " << endl;
+	cout << "     Wasserkraftwerke: " << wasCounter << "x" << "     - Grundpreis: " << wasserBasePrice << " - " << endl;
 	cout << "     resourcenbedarf: ";
-	for (Material m : wa.getMaterial())
-		cout << " # " << m.getName();
+	//for (Material m : wa.getMaterial())
+	//	cout << " # " << m.getName();
 	cout << endl;
 
-	cout << "     Windkraftwerke:  " << winCounter << "x" << "     - Grundpreis: " << wiBasePrice << " - " << endl;
+	cout << "     Windkraftwerke:  " << winCounter << "x" << "     - Grundpreis: " << windBasePrice << " - " << endl;
 	cout << "     resourcenbedarf: ";
-	for (Material m : wi.getMaterial())
-		cout << " # " << m.getName();
+	/*for (Material m : wi.getMaterial())
+		cout << " # " << m.getName();*/
 	cout << endl;
 	cout << "                                   " << endl;
 	cout << "================   KOSTEN   ===================" << endl;
@@ -162,7 +160,14 @@ void CapCitySim::menu()
 			loadingAnimation();
 
 			plottMap(n, m);
+
+			for (pair<Material, int> m : MaterialDB::materialUsed) {
+				cout << "Material: " + m.first.getName() + " Anzahl: " + to_string(m.second) << endl;
+			}
+
+
 			subMenuOption();
+
 
 			break;
 
@@ -181,7 +186,7 @@ void CapCitySim::menu()
 			cout << "Abriss sequenz gestartet" << endl;
 			//loadingAnimation();
 
-			loeschen(city);
+			loeschen();
 
 			break;
 		case 4:
@@ -278,7 +283,7 @@ void CapCitySim::build()
 		cout << "Bitte geben Sie Gebäudetyp an, den Sie platzieren wollen" << endl;
 		cout << "1 = SOLAR, 2 = WINDKRAFT, 3 = WASSERKRAFT" << endl;
 
-		if (cin >> gebIndex && gebIndex > 0 && gebIndex < 3)		// Abfrage ob cin was in die konsole bekommt
+		if (cin >> gebIndex && gebIndex > 0 && gebIndex < 4)		// Abfrage ob cin was in die konsole bekommt
 			break;
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -321,13 +326,13 @@ void CapCitySim::build()
 
 	//loadingAnimation();
 
-	setzen(city, setX, setY, gebIndex, buildSizeX, buildSizeY);
+	setzen(setX, setY, gebIndex, buildSizeX, buildSizeY);
 
 	cout << "Prozess beendet" << endl;
 
 	subMenuOption();
 }
-void CapCitySim::setzen(Building** arr, int i, int j, int id, int x, int y)
+void CapCitySim::setzen(int i, int j, int id, int x, int y)
 {
 	int row = i + y;
 	int col = j + x;
@@ -339,11 +344,11 @@ void CapCitySim::setzen(Building** arr, int i, int j, int id, int x, int y)
 		{
 			switch (id)
 			{
-			case 1: arr[o][p] = Solarpanel();
+			case 1: city[o][p] = Solarpanel();
 				break;
-			case 2: arr[o][p] = Windkraft();
+			case 2: city[o][p] = Windkraft();
 				break;
-			case 3: arr[o][p] = Wasserkraft();
+			case 3: city[o][p] = Wasserkraft();
 				break;
 			default:
 				break;
@@ -351,7 +356,7 @@ void CapCitySim::setzen(Building** arr, int i, int j, int id, int x, int y)
 		}
 	}
 }
-void CapCitySim::loeschen(Building** arr)
+void CapCitySim::loeschen()
 {
 	int x, y;
 	cout << "Bitte X koordinate eingeben:" << endl;
@@ -359,7 +364,7 @@ void CapCitySim::loeschen(Building** arr)
 	cout << "Bitte Y koordinate eingeben:" << endl;
 	cin >> y;
 
-	arr[x][y] = Leer();
+	city[x][y] = Leer();
 
 	subMenuOption();
 }

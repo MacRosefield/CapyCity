@@ -43,7 +43,7 @@ public:
 
 	int proof(Building** arr, int i, int j, int x, int y);
 
-	void loeschen(Building** arr);
+	void loeschen();
 
 	void subMenu();
 	void subMenuOption();
@@ -55,7 +55,7 @@ public:
 	void errorScreenFull();
 
 
-	void setzen(Building** arr, int i, int j, int id, int x, int y);
+	void setzen(int i, int j, int id, int x, int y);
 	void build();
 
 	void calcPrice();
