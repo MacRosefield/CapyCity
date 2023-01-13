@@ -10,6 +10,7 @@
 #include "Building.h"
 #include "Material.h"
 #include "MaterialDB.h"
+#include "Blueprint.h"
 
 
 using namespace std;
@@ -54,9 +55,7 @@ void CapCitySim::runin() {
 	for (i = 0; i < n; i++)
 		city[i] = new Building[m];
 
-	CapCitySim::initialMap(n, m);
-
-	//CapCitySim::plottMap(n, m);
+	Blueprint::initialMap(city, n, m);
 
 	CapCitySim::menu();
 
@@ -67,77 +66,77 @@ void CapCitySim::runin() {
 	delete[] city;
 }
 
-void CapCitySim::initialMap(int row, int col)
-{
-	// Fuellen die Matrix wieder mit LEER auf
-	for (int i = 0; i < row; i++)
-	{
-		for (int j = 0; j < col; j++)
-		{
-			city[i][j] = Leer();
-		}
-	}
-}
+//void CapCitySim::initialMap(int row, int col)
+//{
+//	// Fuellen die Matrix wieder mit LEER auf
+//	for (int i = 0; i < row; i++)
+//	{
+//		for (int j = 0; j < col; j++)
+//		{
+//			city[i][j] = Leer();
+//		}
+//	}
+//}
 
-void CapCitySim::plottMap(int row, int col)
-{
-	// Ausgabe der Matrix auf der Konsole
-	for (int i = 0; i < row; i++)
-	{
-		for (int j = 0; j < col; j++)
-		{
-			string type = city[i][j].getName();
-
-			if (type == "Leer") {
-				cout << "[    ]";
-			}
-			else if (type == "Solarpanel") {
-				cout << "[ SO ]";
-			}
-			else if (type == "Wasserkraft") {
-				cout << "[ WA ]";
-			}
-			else if (type == "Windkraft") {
-				cout << "[ WI ]";
-			}
-		}
-		cout << endl;
-
-	}
-
-
-
-
-	calcPrice();
-	cout << "================   GEBAEUDE   ===================" << endl;
-	cout << "                                   " << endl;
-	cout << "     Solarpanele: " << solCounter << "x" << "     - Grundpreis: " << solarBasePrice << " - " << endl;
-	cout << endl;
-	cout << "     Wasserkraftwerke: " << wasCounter << "x" << "     - Grundpreis: " << wasserBasePrice << " - " << endl;
-	cout << endl;
-	cout << "     Windkraftwerke:  " << winCounter << "x" << "     - Grundpreis: " << windBasePrice << " - " << endl;
-	cout << endl;
-	cout << "                                   " << endl;
-	cout << "================   KOSTEN   ===================" << endl;
-	cout << "                                   " << endl;
-	cout << "      Bauplatz:" << endl;
-	cout << "         Solarpanele = " << buildPriceSo << " $" << endl;
-	cout << "         Wasserkraftwerke = " << buildPriceWa << " $" << endl;
-	cout << "         Windkraftwerke = " << buildPriceWi << " $" << endl;
-	cout << "                                   " << endl;
-	cout << "================   KOSTEN   ===================" << endl;
-	cout << endl;
-	cout << "      Material verbaut:" << endl;
-	for (pair<Material, int> m : MaterialDB::materialUsed) {
-		cout << "        " + m.first.getName() + " - Anzahl: " + to_string(m.second) << endl;
-	}
-	cout << endl;
-	cout << "      Materialkosten gesamt = " << materialPriceAll << " $" << endl;
-	cout << endl;
-	cout << "      Gebaeudekosten gesamt = " << buildPriceAll << " $" << endl;
-	cout << "                                   " << endl;
-	cout << "============== SELECT UR OPTION ===============" << endl;
-}
+//void CapCitySim::plottMap(int row, int col)
+//{
+//	// Ausgabe der Matrix auf der Konsole
+//	for (int i = 0; i < row; i++)
+//	{
+//		for (int j = 0; j < col; j++)
+//		{
+//			string type = city[i][j].getName();
+//
+//			if (type == "Leer") {
+//				cout << "[    ]";
+//			}
+//			else if (type == "Solarpanel") {
+//				cout << "[ SO ]";
+//			}
+//			else if (type == "Wasserkraft") {
+//				cout << "[ WA ]";
+//			}
+//			else if (type == "Windkraft") {
+//				cout << "[ WI ]";
+//			}
+//		}
+//		cout << endl;
+//
+//	}
+//
+//
+//
+//
+//	calcPrice();
+//	cout << "================   GEBAEUDE   ===================" << endl;
+//	cout << "                                   " << endl;
+//	cout << "     Solarpanele: " << solCounter << "x" << "     - Grundpreis: " << solarBasePrice << " - " << endl;
+//	cout << endl;
+//	cout << "     Wasserkraftwerke: " << wasCounter << "x" << "     - Grundpreis: " << wasserBasePrice << " - " << endl;
+//	cout << endl;
+//	cout << "     Windkraftwerke:  " << winCounter << "x" << "     - Grundpreis: " << windBasePrice << " - " << endl;
+//	cout << endl;
+//	cout << "                                   " << endl;
+//	cout << "================   KOSTEN   ===================" << endl;
+//	cout << "                                   " << endl;
+//	cout << "      Bauplatz:" << endl;
+//	cout << "         Solarpanele = " << buildPriceSo << " $" << endl;
+//	cout << "         Wasserkraftwerke = " << buildPriceWa << " $" << endl;
+//	cout << "         Windkraftwerke = " << buildPriceWi << " $" << endl;
+//	cout << "                                   " << endl;
+//	cout << "================   KOSTEN   ===================" << endl;
+//	cout << endl;
+//	cout << "      Material verbaut:" << endl;
+//	for (pair<Material, int> m : MaterialDB::materialUsed) {
+//		cout << "        " + m.first.getName() + " - Anzahl: " + to_string(m.second) << endl;
+//	}
+//	cout << endl;
+//	cout << "      Materialkosten gesamt = " << materialPriceAll << " $" << endl;
+//	cout << endl;
+//	cout << "      Gebaeudekosten gesamt = " << buildPriceAll << " $" << endl;
+//	cout << "                                   " << endl;
+//	cout << "============== SELECT UR OPTION ===============" << endl;
+//}
 
 void CapCitySim::menu()
 {
@@ -154,7 +153,7 @@ void CapCitySim::menu()
 			cout << "BAUPLAN WIRD GELADEN" << endl;
 			loadingAnimation();
 
-			plottMap(n, m);
+			Blueprint::plottMap(city, n, m);
 
 
 
@@ -390,60 +389,60 @@ int CapCitySim::proof(Building** arr, int i, int j, int x, int y)
 	return errorState;
 }
 
-void CapCitySim::calcPrice() {
-
-	buildPriceAll = 0;
-	buildPriceSo = 0;
-	buildPriceWa = 0;
-	buildPriceWi = 0;
-	solCounter = 0;
-	wasCounter = 0;
-	winCounter = 0;
-
-	materialPriceAll = 0;
-
-
-
-	for (pair<Material, int> m : MaterialDB::materialUsed) {
-		materialPriceAll += (m.first.getPrice() * m.second);
-
-	}
-
-
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < m; j++)
-		{
-
-			buildPriceAll += city[i][j].getPrice();
-
-			if (city[i][j].getName() != "Leer") {
-
-			}
-
-			if (city[i][j].getName() == "Solarpanel") {
-
-
-				buildPriceSo += city[i][j].getPrice();
-				solCounter++;
-			}
-
-			if (city[i][j].getName() == "Wasserkraft") {
-
-
-				buildPriceWa += city[i][j].getPrice();
-				wasCounter++;
-			}
-
-			if (city[i][j].getName() == "Windkraft") {
-
-
-				buildPriceWi += city[i][j].getPrice();
-				winCounter++;
-			}
-
-		}
-	}
-
-	buildPriceAll += materialPriceAll;
-}
+//void CapCitySim::calcPrice() {
+//
+//	buildPriceAll = 0;
+//	buildPriceSo = 0;
+//	buildPriceWa = 0;
+//	buildPriceWi = 0;
+//	solCounter = 0;
+//	wasCounter = 0;
+//	winCounter = 0;
+//
+//	materialPriceAll = 0;
+//
+//
+//
+//	for (pair<Material, int> m : MaterialDB::materialUsed) {
+//		materialPriceAll += (m.first.getPrice() * m.second);
+//
+//	}
+//
+//
+//	for (int i = 0; i < n; i++)
+//	{
+//		for (int j = 0; j < m; j++)
+//		{
+//
+//			buildPriceAll += city[i][j].getPrice();
+//
+//			if (city[i][j].getName() != "Leer") {
+//
+//			}
+//
+//			if (city[i][j].getName() == "Solarpanel") {
+//
+//
+//				buildPriceSo += city[i][j].getPrice();
+//				solCounter++;
+//			}
+//
+//			if (city[i][j].getName() == "Wasserkraft") {
+//
+//
+//				buildPriceWa += city[i][j].getPrice();
+//				wasCounter++;
+//			}
+//
+//			if (city[i][j].getName() == "Windkraft") {
+//
+//
+//				buildPriceWi += city[i][j].getPrice();
+//				winCounter++;
+//			}
+//
+//		}
+//	}
+//
+//	buildPriceAll += materialPriceAll;
+//}
