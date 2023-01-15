@@ -32,6 +32,7 @@ public:
 	string getLabel();
 	int getPrice();
 	int getPower();
+	Building getCity();
 
 
 
@@ -52,7 +53,6 @@ public:
 	// Constructor
 	Solarpanel();
 
-
 };
 
 
@@ -61,12 +61,10 @@ class Wasserkraft : public Building {
 public:
 	// Constructor
 	Wasserkraft();
-
 };
 
 class Windkraft : public Building {
 public:
 	// Constructor
 	Windkraft();
-
 };

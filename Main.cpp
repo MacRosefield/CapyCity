@@ -18,6 +18,7 @@
 // ######################## MY HAEEEEDER BABEEEDER ######################
 
 #include "CapCitySim.h"
+#include "Blueprint.h"
 
 
 
@@ -25,6 +26,8 @@ int main(void)
 {
 
 	CapCitySim planer = CapCitySim();
+
+	Blueprint a = Blueprint();
 
 	planer.runin();
 

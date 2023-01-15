@@ -8,23 +8,22 @@
 #include "CapCitySim.h"
 
 
-	static int buildPriceAll;
-	static int buildPriceSo;
-	static int buildPriceWa;
-	static int buildPriceWi;
-	static int materialPriceAll;
+static int buildPriceAll;
+static int buildPriceSo;
+static int buildPriceWa;
+static int buildPriceWi;
+static int materialPriceAll;
 
-	static int solCounter;
-	static int wasCounter;
-	static int winCounter;
+static int solCounter;
+static int wasCounter;
+static int winCounter;
 
 
 class Blueprint {
 
 public:
 
-
-
+	int row, col, n, m;
 
 
 
@@ -33,3 +32,4 @@ public:
 	static void calcPrice(Building** arr, int row, int col);
 
 };
+

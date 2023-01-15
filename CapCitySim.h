@@ -18,15 +18,7 @@ public:
 	int errorState = 0;
 
 
-	/*int buildPriceAll;
-	int buildPriceSo;
-	int buildPriceWa;
-	int buildPriceWi;
-	int materialPriceAll;*/
 
-	/*int solCounter;
-	int wasCounter;
-	int winCounter;*/
 
 	int soBasePrice;
 	int waBasePrice;
@@ -34,9 +26,6 @@ public:
 
 	// ########################## PROTOTYPS #####################################
 	void runin();
-
-	//void initialMap(int row, int col);
-	//void plottMap(int row, int col);
 
 	void menu();
 	void mainMenu();
@@ -58,7 +47,6 @@ public:
 	void setzen(int i, int j, int id, int x, int y);
 	void build();
 
-	//void calcPrice();
 
 
 
