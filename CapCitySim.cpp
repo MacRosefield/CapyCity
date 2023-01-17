@@ -10,7 +10,7 @@
 #include "Building.h"
 #include "Material.h"
 #include "MaterialDB.h"
-#include "Blueprint.h"
+//#include "Blueprint.h"
 
 
 using namespace std;
@@ -18,7 +18,12 @@ using namespace std;
 // ############################ DEKLARIEREN #################################
 
 
+
+Blueprint singleMap = Blueprint();
+Blueprint allMaps = Blueprint(0);
+
 void CapCitySim::runin() {
+
 
 	cout << "Herzlich Wilkommen im Baumaster 7000" << endl;
 	cout << "Ihr Tool fuer die unnoetige Landschaftsplanung" << endl;
@@ -47,24 +52,22 @@ void CapCitySim::runin() {
 		// loadingAnimation();
 	} while (true);
 
-
 	// Speicherplatzreservierung notwendig, da wir hier einen dynamischen Array erstellen wollen        spalte    spalte
 	// Array a  double * bestimmt sozusagen die Anzahl der Zeilen                               row ||  [0]        [0]    [0]   [0]
 	// Innerhalb der Zeilen wird jeweils ein Array mit "m" Spalten erzeugt                      row ||  [0]        [0]    [0]   [0]
-	city = new Building * [n];
-	for (i = 0; i < n; i++)
-		city[i] = new Building[m];
+
+	singleMap.createCity(n, m);
+	singleMap.initialMap(n, m);
 
 
-	Blueprint::initialMap(city, n, m);
+	/*allMaps.saveCity(singleMap.city);*/
 
 	CapCitySim::menu();
 
 	// ########################################### SPEICHER FREIGEBEN #################################################
 
-	for (i = 0; i < n; i++)
-		delete[] city[i];
-	delete[] city;
+	singleMap.deleteCity(n, m);
+
 }
 
 
@@ -83,12 +86,9 @@ void CapCitySim::menu()
 			cout << "BAUPLAN WIRD GELADEN" << endl;
 			loadingAnimation();
 
-			Blueprint::plottMap(city, n, m);
-
-
+			singleMap.plottMap(n, m);
 
 			subMenuOption();
-
 
 			break;
 
@@ -107,11 +107,14 @@ void CapCitySim::menu()
 			cout << "Abriss sequenz gestartet" << endl;
 			//loadingAnimation();
 
-			loeschen();
+			//loeschen();
 
 			break;
 		case 4:
 			cout << "Option [4] wurde ausgewählt!" << endl;
+			cout << "Blueprint menue wird aufgerufen " << endl;
+			bluePrintMenuOption();
+
 			break;
 		case 5:
 			cout << "Programm wird beendet!" << endl;
@@ -127,12 +130,13 @@ void CapCitySim::mainMenu()
 	cout << " Bauplan anzeigen   - - - -  [1]   " << endl;
 	cout << " Baumodus starten   - - - -  [2]   " << endl;
 	cout << " Bauplatz freigeben - - - -  [3]   " << endl;
-	cout << " Option 4           - - - -  [4]   " << endl;
+	cout << " Bauplan verwalten  - - - -  [4]   " << endl;
 	cout << " ==  EXIT  ==       - - - -  [5]   " << endl;
 	cout << "                                   " << endl;
 	cout << "======== SELECT UR OPTION =========" << endl;
 	cin >> choice1;
 }
+
 void CapCitySim::subMenu()
 {
 	cout << "========    SUB MENU   ============" << endl;
@@ -166,6 +170,69 @@ void CapCitySim::subMenuOption()
 			break;
 		}
 	} while (choice2 > 2);
+}
+
+void CapCitySim::bluePrintMenu() {
+
+	cout << "========    SUB MENU   ============" << endl;
+	cout << " ==  MAP speichern  - - - -  [1]   " << endl;
+	cout << " ==  MAP laden      - - - -  [2]   " << endl;
+	cout << " ==  NEUE MAP anlegen    - - [3]   " << endl;
+	cout << " ==  MAP vergleichen  - - -  [4]   " << endl;
+	cout << "                                   " << endl;
+	cout << " ==  ZURUECK                 [5]   " << endl;
+	cout << "======== SELECT UR OPTION =========" << endl;
+	cin >> choice3;
+}
+
+void CapCitySim::bluePrintMenuOption() {
+	do
+	{
+		choice3 = 0;
+		bluePrintMenu();
+		switch (choice3)
+		{
+		case 1:
+			cout << "Option [1] wurde ausgewaehlt!" << endl;
+			cout << "MAP wird gespeichert" << endl;
+			//loadingAnimation();
+			allMaps.saveCity(singleMap.city, n, m);
+			menu();
+			break;
+		case 2:
+			cout << "Option [2] wurde ausgewaehlt!" << endl;
+			cout << "MAP wird geladen" << endl;
+
+			allMaps.loadCity(singleMap.city, 0, n, m);
+			loadingAnimation();
+			menu();
+			break;
+
+		case 3:
+			cout << "Option [3] wurde ausgewaehlt!" << endl;
+			cout << "Neue Map erstellt" << endl;
+			singleMap.initialMap(n, m);
+			menu();
+			break;
+
+		case 4:
+			cout << "Option [4] wurde ausgewaehlt!" << endl;
+			cout << "wird noch eingefügt" << endl;
+
+			menu();
+			break;
+
+		case 5:
+			cout << "Option [5] wurde ausgewaehlt!" << endl;
+			loadingAnimation();
+
+			menu();
+			break;
+
+		default:
+			break;
+		}
+	} while (choice3 > 5);
 }
 
 int CapCitySim::loadingAnimation()
@@ -230,7 +297,7 @@ void CapCitySim::build()
 		cin >> setY;
 		cout << "DANKE, Deine Eingaben werden nun verarbeitet" << endl;
 		//loadingAnimation();
-		proof(city, setX, setY, buildSizeX, buildSizeY);
+		proof(singleMap.city, setX, setY, buildSizeX, buildSizeY);
 		switch (errorState)
 		{
 		case 1:
@@ -253,6 +320,8 @@ void CapCitySim::build()
 
 	subMenuOption();
 }
+
+
 void CapCitySim::setzen(int i, int j, int id, int x, int y)
 {
 	int row = i + y;
@@ -265,11 +334,11 @@ void CapCitySim::setzen(int i, int j, int id, int x, int y)
 		{
 			switch (id)
 			{
-			case 1: city[o][p] = Solarpanel();
+			case 1: singleMap.city[o][p] = Solarpanel();
 				break;
-			case 2: city[o][p] = Windkraft();
+			case 2: singleMap.city[o][p] = Windkraft();
 				break;
-			case 3: city[o][p] = Wasserkraft();
+			case 3: singleMap.city[o][p] = Wasserkraft();
 				break;
 			default:
 				break;
@@ -285,7 +354,7 @@ void CapCitySim::loeschen()
 	cout << "Bitte Y koordinate eingeben:" << endl;
 	cin >> y;
 
-	city[x][y] = Leer();
+	singleMap.city[x][y] = Leer();
 
 	subMenuOption();
 }

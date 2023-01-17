@@ -27,8 +27,6 @@ int main(void)
 
 	CapCitySim planer = CapCitySim();
 
-	Blueprint a = Blueprint();
-
 	planer.runin();
 
 	return 0;

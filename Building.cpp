@@ -22,6 +22,8 @@ int Building::getPower() {
 
 
 
+
+
 Leer::Leer() {
 	name = "Leer";
 	label = " ";

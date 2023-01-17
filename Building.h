@@ -25,7 +25,6 @@ public:
 	int power;
 
 
-
 	// Public member variables
 	// Public member functions;
 	string getName();
@@ -34,18 +33,13 @@ public:
 	int getPower();
 	Building getCity();
 
-
-
-
 };
 
 class Leer : public Building {
 
-
 public:
 	// Constructor
 	Leer();
-
 };
 
 class Solarpanel : public Building {
