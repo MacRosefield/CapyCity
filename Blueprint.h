@@ -32,18 +32,8 @@ public:
 
 
 	int solCounter;
-	//string saveGameTemp;
-	//string saveGame_1 = " - - - - ";
-	//string saveGame_2 = " - - - - ";
-	//string saveGame_3 = " - - - - ";
-	//string saveGame_4 = " - - - - ";
-	//string saveGame_5 = " - - - - ";
 
 	int versionIndex;
-	//int saveGameIndex;
-
-
-
 
 	int errorState;
 

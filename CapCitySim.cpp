@@ -35,21 +35,24 @@ void CapCitySim::runin() {
 	do
 	{
 		cout << "Anzahl der Zeilen eingeben: " << endl;
-		if (cin >> n && n > 0 && n < 41)		// Abfrage ob cin was in die konsole bekommt
+		if (cin >> n && n > 0 && n < 41)// Abfrage ob cin was in die konsole bekommt
+		{
 			rows = n;
-		break;
+			break;
+		}
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << "Bitte nur ganze Zahlen eingeben: [1 - 40]" << endl;
 
 	} while (true);
-
 	do
 	{
 		cout << "Anzahl der Spalten eingeben: " << endl;
 		if (cin >> m && m > 0 && m < 41)
+		{
 			cols = m;
-		break;
+			break;
+		}
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << "Bitte nur ganze Zahlen eingeben: [1 - 40]" << endl;
