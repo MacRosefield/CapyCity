@@ -10,17 +10,19 @@
 #include "Building.h"
 #include "Material.h"
 #include "MaterialDB.h"
-//#include "Blueprint.h"
+#include "Blueprint.h"
 
 
 using namespace std;
 
-// ############################ DEKLARIEREN #################################
-
-
+// ############################ KONSTRUKTOR #################################
+int rows = 0;
+int cols = 0;
 
 Blueprint singleMap = Blueprint();
 Blueprint allMaps = Blueprint(0);
+
+// ############################ DEKLARIEREN #################################
 
 void CapCitySim::runin() {
 
@@ -34,7 +36,8 @@ void CapCitySim::runin() {
 	{
 		cout << "Anzahl der Zeilen eingeben: " << endl;
 		if (cin >> n && n > 0 && n < 41)		// Abfrage ob cin was in die konsole bekommt
-			break;
+			rows = n;
+		break;
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << "Bitte nur ganze Zahlen eingeben: [1 - 40]" << endl;
@@ -45,7 +48,8 @@ void CapCitySim::runin() {
 	{
 		cout << "Anzahl der Spalten eingeben: " << endl;
 		if (cin >> m && m > 0 && m < 41)
-			break;
+			cols = m;
+		break;
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << "Bitte nur ganze Zahlen eingeben: [1 - 40]" << endl;
@@ -56,8 +60,8 @@ void CapCitySim::runin() {
 	// Array a  double * bestimmt sozusagen die Anzahl der Zeilen                               row ||  [0]        [0]    [0]   [0]
 	// Innerhalb der Zeilen wird jeweils ein Array mit "m" Spalten erzeugt                      row ||  [0]        [0]    [0]   [0]
 
-	singleMap.createCity(n, m);
-	singleMap.initialMap(n, m);
+	singleMap.createCity();
+	singleMap.initialMap();
 
 
 	/*allMaps.saveCity(singleMap.city);*/
@@ -66,7 +70,7 @@ void CapCitySim::runin() {
 
 	// ########################################### SPEICHER FREIGEBEN #################################################
 
-	singleMap.deleteCity(n, m);
+	singleMap.deleteCity();
 
 }
 
@@ -86,7 +90,7 @@ void CapCitySim::menu()
 			cout << "BAUPLAN WIRD GELADEN" << endl;
 			loadingAnimation();
 
-			singleMap.plottMap(n, m);
+			singleMap.plottMap(singleMap.city);
 
 			subMenuOption();
 
@@ -95,7 +99,7 @@ void CapCitySim::menu()
 		case 2:
 			cout << "Option [2] wurde ausgewählt!" << endl;
 			cout << "Baumenü wird geladen" << endl;
-			//loadingAnimation();
+			loadingAnimation();
 
 
 			build();
@@ -105,9 +109,10 @@ void CapCitySim::menu()
 		case 3:
 			cout << "Option [3] wurde ausgewählt!" << endl;
 			cout << "Abriss sequenz gestartet" << endl;
-			//loadingAnimation();
 
-			//loeschen();
+
+			singleMap.loeschen();
+			menu();
 
 			break;
 		case 4:
@@ -117,12 +122,18 @@ void CapCitySim::menu()
 
 			break;
 		case 5:
+			cout << "Option [5] wurde ausgewählt!" << endl;
+			cout << "Kennzahl der aktuellen Map: " << endl;
+			cout << singleMap.calcCoefficientMap(singleMap.city) << endl;
+			menu();
+			break;
+		case 6:
 			cout << "Programm wird beendet!" << endl;
 			break;
 		default:
 			break;
 		}
-	} while (choice1 > 5);
+	} while (choice1 > 6);
 }
 void CapCitySim::mainMenu()
 {
@@ -131,7 +142,8 @@ void CapCitySim::mainMenu()
 	cout << " Baumodus starten   - - - -  [2]   " << endl;
 	cout << " Bauplatz freigeben - - - -  [3]   " << endl;
 	cout << " Bauplan verwalten  - - - -  [4]   " << endl;
-	cout << " ==  EXIT  ==       - - - -  [5]   " << endl;
+	cout << " Kennzahl ausgeben  - - - -  [5]   " << endl;
+	cout << " ==  EXIT  ==       - - - -  [6]   " << endl;
 	cout << "                                   " << endl;
 	cout << "======== SELECT UR OPTION =========" << endl;
 	cin >> choice1;
@@ -174,13 +186,13 @@ void CapCitySim::subMenuOption()
 
 void CapCitySim::bluePrintMenu() {
 
-	cout << "========    SUB MENU   ============" << endl;
+	cout << "======  BLUEPRINT MENU   ==========" << endl;
 	cout << " ==  MAP speichern  - - - -  [1]   " << endl;
 	cout << " ==  MAP laden      - - - -  [2]   " << endl;
 	cout << " ==  NEUE MAP anlegen    - - [3]   " << endl;
 	cout << " ==  MAP vergleichen  - - -  [4]   " << endl;
-	cout << "                                   " << endl;
-	cout << " ==  ZURUECK                 [5]   " << endl;
+	cout << " ---  PLOTT SORTED MAPS - -  [5]   " << endl;
+	cout << " ==  ZURUECK                 [6]   " << endl;
 	cout << "======== SELECT UR OPTION =========" << endl;
 	cin >> choice3;
 }
@@ -194,24 +206,23 @@ void CapCitySim::bluePrintMenuOption() {
 		{
 		case 1:
 			cout << "Option [1] wurde ausgewaehlt!" << endl;
-			cout << "MAP wird gespeichert" << endl;
-			//loadingAnimation();
-			allMaps.saveCity(singleMap.city, n, m);
+
+			nameSaveGame();
+
 			menu();
 			break;
 		case 2:
 			cout << "Option [2] wurde ausgewaehlt!" << endl;
-			cout << "MAP wird geladen" << endl;
 
-			allMaps.loadCity(singleMap.city, 0, n, m);
-			loadingAnimation();
+			loadSaveGame();
+
 			menu();
 			break;
 
 		case 3:
 			cout << "Option [3] wurde ausgewaehlt!" << endl;
 			cout << "Neue Map erstellt" << endl;
-			singleMap.initialMap(n, m);
+			singleMap.initialMap();
 			menu();
 			break;
 
@@ -224,6 +235,13 @@ void CapCitySim::bluePrintMenuOption() {
 
 		case 5:
 			cout << "Option [5] wurde ausgewaehlt!" << endl;
+			cout << "wird noch eingefügt" << endl;
+			allMaps.sortedMapOutput();
+
+			break;
+
+		case 6:
+			cout << "Option [6] wurde ausgewaehlt!" << endl;
 			loadingAnimation();
 
 			menu();
@@ -232,7 +250,149 @@ void CapCitySim::bluePrintMenuOption() {
 		default:
 			break;
 		}
-	} while (choice3 > 5);
+	} while (choice3 > 7);
+}
+
+
+void CapCitySim::saveStateMenu() {
+
+	cout << "=========  SAVE MENU   ===========" << endl;
+	cout << " 1.  " << saveGame_1 << "[1]" << endl;
+	cout << " 2.  " << saveGame_2 << "[2]" << endl;
+	cout << " 3.  " << saveGame_3 << "[3]" << endl;
+	cout << " 4.  " << saveGame_4 << "[4]" << endl;
+	cout << " 5.  " << saveGame_5 << "[5]" << endl;
+	cout << " ==  ZURUECK                 [6]   " << endl;
+	cout << "======== SELECT UR OPTION =========" << endl;
+
+
+	do
+	{
+
+		if (cin >> choice4 && choice4 > 0 && choice4 < 7)		// Abfrage ob cin was in die konsole bekommt
+			break;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Bitte nur ganze Zahlen eingeben: [1 - 6]" << endl;
+
+	} while (true);
+}
+
+void CapCitySim::loadStateMenu() {
+
+	cout << "=========  LOAD MENU   ===========" << endl;
+	cout << " 1.  " << saveGame_1 << "[1]" << endl;
+	cout << " 2.  " << saveGame_2 << "[2]" << endl;
+	cout << " 3.  " << saveGame_3 << "[3]" << endl;
+	cout << " 4.  " << saveGame_4 << "[4]" << endl;
+	cout << " 5.  " << saveGame_5 << "[5]" << endl;
+	cout << "                            " << endl;
+	cout << " ==  ZURUECK             [6]" << endl;
+	cout << "======== SELECT UR OPTION =========" << endl;
+
+
+	do
+	{
+
+		if (cin >> choice4 && choice4 > 0 && choice4 < 8)		// Abfrage ob cin was in die konsole bekommt
+			break;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Bitte nur ganze Zahlen eingeben: [1 - 7]" << endl;
+
+	} while (true);
+}
+
+void CapCitySim::nameSaveGame() {
+
+	do
+	{
+		choice4 = 0;
+		saveStateMenu();
+
+		cout << "Bitte Name fuer Speicherstand eingeben:" << endl;
+		cin >> saveGameTemp;
+
+		//loadingAnimation();
+
+		switch (choice4)
+		{
+		case 1:
+			saveGame_1 = saveGameTemp;
+			allMaps.saveCity(singleMap.city, choice4 - 1, n, m);
+			break;
+		case 2:
+			saveGame_2 = saveGameTemp;
+			allMaps.saveCity(singleMap.city, choice4 - 1, n, m);
+			break;
+		case 3:
+			saveGame_3 = saveGameTemp;
+			allMaps.saveCity(singleMap.city, choice4 - 1, n, m);
+			break;
+		case 4:
+			saveGame_4 = saveGameTemp;
+			allMaps.saveCity(singleMap.city, choice4 - 1, n, m);
+			break;
+		case 5:
+			saveGame_5 = saveGameTemp;
+			allMaps.saveCity(singleMap.city, choice4 - 1, n, m);
+			break;
+		default:
+			break;
+		}
+
+	} while (choice4 > 5);
+
+
+
+}
+
+void CapCitySim::loadSaveGame() {
+
+	do
+	{
+		choice4 = 0;
+		loadStateMenu();
+
+
+
+
+		switch (choice4)
+		{
+		case 1:
+
+			allMaps.loadCity(singleMap.city, choice4 - 1, n, m);
+			break;
+		case 2:
+
+			allMaps.loadCity(singleMap.city, choice4 - 1, n, m);
+			break;
+		case 3:
+
+			allMaps.loadCity(singleMap.city, choice4 - 1, n, m);
+			break;
+		case 4:
+
+			allMaps.loadCity(singleMap.city, choice4 - 1, n, m);
+			break;
+		case 5:
+
+			allMaps.loadCity(singleMap.city, choice4 - 1, n, m);
+			break;
+		case 6:
+
+			menu();
+			break;
+
+		default:
+			break;
+		}
+
+	} while (choice4 > 6);
+
+	loadingAnimation();
+
+
 }
 
 int CapCitySim::loadingAnimation()
@@ -282,7 +442,7 @@ void CapCitySim::build()
 
 	do
 	{
-		errorState = 0;
+		accessible = 0;
 		cout << "Bitte gib noch die breite des zu planenden Gebaeudes ein." << endl;
 
 		cin >> buildSizeX;
@@ -297,8 +457,8 @@ void CapCitySim::build()
 		cin >> setY;
 		cout << "DANKE, Deine Eingaben werden nun verarbeitet" << endl;
 		//loadingAnimation();
-		proof(singleMap.city, setX, setY, buildSizeX, buildSizeY);
-		switch (errorState)
+		accessible = singleMap.proof(singleMap.city, setX, setY, buildSizeX, buildSizeY);
+		switch (accessible)
 		{
 		case 1:
 			errorScreenOut();
@@ -310,80 +470,14 @@ void CapCitySim::build()
 			break;
 		}
 
-	} while (errorState > 0);
+	} while (accessible > 0);
 
-	//loadingAnimation();
 
-	setzen(setX, setY, gebIndex, buildSizeX, buildSizeY);
+
+	singleMap.setzen(setX, setY, gebIndex, buildSizeX, buildSizeY);
 
 	cout << "Prozess beendet" << endl;
 
 	subMenuOption();
 }
 
-
-void CapCitySim::setzen(int i, int j, int id, int x, int y)
-{
-	int row = i + y;
-	int col = j + x;
-	// Eingabe der Matrixelemente
-	// Hier besteht die Möglichkeit jeden einzelnen Wert der Matrix zu bestimmen.
-	for (int o = i; o < row; o++)
-	{
-		for (int p = j; p < col; p++)
-		{
-			switch (id)
-			{
-			case 1: singleMap.city[o][p] = Solarpanel();
-				break;
-			case 2: singleMap.city[o][p] = Windkraft();
-				break;
-			case 3: singleMap.city[o][p] = Wasserkraft();
-				break;
-			default:
-				break;
-			}
-		}
-	}
-}
-void CapCitySim::loeschen()
-{
-	int x, y;
-	cout << "Bitte X koordinate eingeben:" << endl;
-	cin >> x;
-	cout << "Bitte Y koordinate eingeben:" << endl;
-	cin >> y;
-
-	singleMap.city[x][y] = Leer();
-
-	subMenuOption();
-}
-
-int CapCitySim::proof(Building** arr, int i, int j, int x, int y)
-{
-
-	int row = i + y;
-	int col = j + x;
-
-	errorState = 0;
-
-	if (row > n || col > m)
-	{
-		errorState = 1;
-	}
-	else
-	{
-		for (int o = i; o < row; o++)
-		{
-			for (int p = j; p < col; p++)
-			{
-
-				if (arr[o][p].getName() != "Leer")
-				{
-					errorState = 2;
-				}
-			}
-		}
-	}
-	return errorState;
-}

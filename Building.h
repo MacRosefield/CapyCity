@@ -24,14 +24,10 @@ public:
 	int price;
 	int power;
 
-
-	// Public member variables
-	// Public member functions;
 	string getName();
 	string getLabel();
 	int getPrice();
 	int getPower();
-	Building getCity();
 
 };
 

@@ -4,25 +4,39 @@
 #include "Building.h"
 #include "Blueprint.h"
 
+extern int rows;
+extern int cols;
+
 class CapCitySim {
 	// ########################## DEKLARIEREN #################
-public:
 
+public:
 	int choice1 = 0; // Menu 1 switcher
 	int choice2 = 0; // Menu 2 switcher
 	int choice3 = 0; // Menu 3 switcher
+	int choice4 = 0;
+
+
 
 	int i, j, n, m;
 	int gebIndex;
 	int buildSizeX, buildSizeY;
 	int setX, setY;
-	int errorState = 0;
+	int accessible = 0;
 
 
 	int soBasePrice;
 	int waBasePrice;
 	int wiBasePrice;
 
+	int saveGameIndex;
+
+	string saveGameTemp;
+	string saveGame_1 = " - - - - ";
+	string saveGame_2 = " - - - - ";
+	string saveGame_3 = " - - - - ";
+	string saveGame_4 = " - - - - ";
+	string saveGame_5 = " - - - - ";
 
 
 	// ########################## PROTOTYPS #####################################
@@ -37,23 +51,17 @@ public:
 	void bluePrintMenu();
 	void bluePrintMenuOption();
 
-	int proof(Building** arr, int i, int j, int x, int y);
+	void saveStateMenu();
+	void loadStateMenu();
 
-	void loeschen();
-
-
+	void nameSaveGame();
+	void loadSaveGame();
 
 	int loadingAnimation();
-
 
 	void errorScreenOut();
 	void errorScreenFull();
 
-
-	void setzen(int i, int j, int id, int x, int y);
 	void build();
-
-
-
 
 };
